@@ -45,18 +45,49 @@ def update_client(client_name, update_client_name):
         print('Client is not in clients list')
 
 
-def delete_client(client_name):
-    global clients
+def delete_client(client):
+        try:
+            global clients
 
-    if client_name in clients:
-        clients.remove(client_name)
-    else:
-        print('Clients is not in clients list')
+            delete = clients.pop(int(client))
+            print('You delete: {}'.format(delete))
+            print('')
+        except IndexError:
+            print('Index out range, intent with another one')
+            client_uid = _get_client_uid()
+            delete_client(client_uid)
 
 
 def search_client(client_name):
+    print('WELCOME TO SEARCH CLIENT')
+    print('*' * 50)
+    print('What would you like to SEARCH?')
+    print('[N]ame')
+    print('[C]ompany')
+    print('[E]mail')
+    print('[P]osition')
+    print('')
+
+    search_field = input()
+    search_field = search_field.upper()
+
+    if search_field == 'N':
+        field = 'name'
+    elif search_field == 'C':
+        field = 'company'
+    elif search_field == 'E':
+        field = 'email'
+    elif search_field == 'P':
+        field = 'position'
+    else:
+        Print('Invalid command')
+
+    _get_client_field(field)
+
+
+    print(search_field)
     for client in clients:
-        if client != client_name:
+        if client['name'] != client_name:
             continue
         else:
             return True
@@ -99,6 +130,17 @@ def _get_client_name():
     return client_name
 
 
+def _get_client_uid():
+    client_uid = None
+    while not client_uid:
+        try:
+            client_uid = int(input('What is the index number? '))
+        except ValueError:
+            print('Command incorrect please use a number')
+
+    return client_uid
+
+
 if __name__ == '__main__':
     _print_welcome()
 
@@ -117,10 +159,13 @@ if __name__ == '__main__':
     elif command == 'L':
         list_clients()
     elif command == 'D':
-        client_name = _get_client_name()
-        delete_client(client_name)
+        list_clients()
+        print('')
+        client_uid = _get_client_uid()
+        delete_client(client_uid)
         list_clients()
     elif command == 'U':
+        list_clients()
         client_name = _get_client_name()
         update_client_name = input('What is the updated client name: ')
         update_client(client_name, update_client_name)
