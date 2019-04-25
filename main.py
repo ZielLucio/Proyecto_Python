@@ -1,19 +1,27 @@
+import csv
+import os
 import sys
-clients = [
-    {
-        'name': 'Pablo',
-        'company': 'Google',
-        'email': 'pablo@google.com',
-        'position': 'Software engineer',
-    },
-    {
-        'name': 'Ricardo',
-        'company': 'Facebook',
-        'email': 'ricardo@facebook.com',
-        'position': 'Data engineer',
-    }
+CLIENT_TABLE = '.clients.csv'
+CLIENT_SCHEMA = ['name', 'company', 'email', 'position']
+clients = []
 
-]
+
+def _initialize_clients_from_storage():
+    with open(CLIENT_TABLE, mode='r') as f:
+        reader = csv.DictReader(f, fieldnames = CLIENT_SCHEMA)
+
+        for row in reader:
+            clients.append(row)
+
+
+def _save_clients_to_storage():
+    tmp_table_name = '{}.tmp'.format(CLIENT_TABLE)
+    with open(tmp_table_name, mode='w') as f:
+        writer= csv.DictWriter(f, fieldnames=CLIENT_SCHEMA)
+        writer.writerows(clients)
+
+        os.remove(CLIENT_TABLE)
+        os.rename(tmp_table_name, CLIENT_TABLE)
 
 
 def create_client(client):
@@ -142,6 +150,8 @@ def _get_client_uid():
 
 
 if __name__ == '__main__':
+    _initialize_clients_from_storage()
+
     _print_welcome()
 
     command = input()
@@ -155,21 +165,21 @@ if __name__ == '__main__':
             'position': _get_client_field('position')
         }
         create_client(client)
-        list_clients()
+
     elif command == 'L':
         list_clients()
     elif command == 'D':
-        list_clients()
+
         print('')
         client_uid = _get_client_uid()
         delete_client(client_uid)
-        list_clients()
+
     elif command == 'U':
-        list_clients()
+
         client_name = _get_client_name()
         update_client_name = input('What is the updated client name: ')
         update_client(client_name, update_client_name)
-        list_clients()
+
     elif command == 'S':
         client_name = _get_client_name()
         found = search_client(client_name)
@@ -179,3 +189,5 @@ if __name__ == '__main__':
             print('The client: {} is not in our client\'s list'.format(client_name))
     else:
         print('Invalid command')
+
+    _save_clients_to_storage()
